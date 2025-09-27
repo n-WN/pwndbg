@@ -933,6 +933,7 @@ def load_commands() -> None:
     import pwndbg.commands.leakfind
     import pwndbg.commands.libcinfo
     import pwndbg.commands.linkmap
+    import pwndbg.commands.llm_integration
     import pwndbg.commands.mallocng
     import pwndbg.commands.memoize
     import pwndbg.commands.misc
