@@ -15,6 +15,13 @@ from pwndbg.commands.context import contextoutput
 from pwndbg.commands.context import resetcontextoutput
 from pwndbg.gdblib import gdb_version
 
+# Import LLM hooks for TUI integration
+try:
+    from pwndbg.gdblib.llm_hooks import tui_capture
+except ImportError:
+    # Fallback if llm_hooks not available
+    tui_capture = None
+
 
 class ContextTUIWindow:
     _tui_window: "gdb.TuiWindow"
@@ -139,6 +146,15 @@ class ContextTUIWindow:
             len(self._ansi_escape_regex.sub("", line)) for line in self._lines
         ]
         self._longest_line = max(self._blank_line_lengths)
+        
+        # Capture TUI changes for LLM analysis
+        if tui_capture is not None:
+            try:
+                tui_capture.capture_section(self._section, self._lines)
+            except Exception:
+                # Silently ignore LLM capture errors to not interfere with normal operation
+                pass
+        
         self.render()
 
     def _verify_enabled_state(self) -> bool:
